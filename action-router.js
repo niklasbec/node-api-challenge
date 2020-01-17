@@ -14,6 +14,30 @@ router.get('/', (req, res) => {
         })
 })
 
+router.get('/:id', async (req, res) => {
+    const { id } = req.params
+    
+    try {
+        const toGet = await Action.get(id)
+        if(toGet) {
+            Action.get(id)
+                .then(action => {
+                    res.status(200).json({
+                    actionInfo: action
+                })
+            })
+        } else {
+            res.status(404).json({
+                error: 'Sorry no Action with that ID found'
+            })
+        }
+    } catch {
+        res.status(500).json({
+            error: 'Server Error'
+        })
+    }
+})
+
 router.post('/:id', async (req, res) => {
         const { id } = req.params
         const newAction = {project_id: id, ...req.body}
@@ -40,6 +64,57 @@ router.post('/:id', async (req, res) => {
             }
         } catch (error) {
                 res.status(500).json(error.message)
+        }
+    })
+
+    router.delete('/:id', async (req, res) => {
+        const { id } = req.params
+        
+        try {
+            const toDelete = await Action.get(id)
+            if(toDelete) {
+                Action.remove(id)
+                    .then(action => {
+                        res.status(202).json({
+                        success: 'Action was removed',
+                        actionInfo: action
+                    })
+                })
+            } else {
+                res.status(404).json({
+                    error: 'Sorry no Action with that ID found'
+                })
+            }
+        } catch {
+            res.status(500).json({
+                error: 'Server Error'
+            })
+        }
+    })
+    
+    router.put('/:id', async (req, res) => {
+        const { id } = req.params
+        const newData = req.body
+        
+        try {
+            const toUpdate = await Action.get(id)
+            if(toUpdate && newData.notes && newData.description) {
+                Action.update(id, newData)
+                    .then(action => {
+                        res.status(200).json({
+                        success: 'Action was updated',
+                        actionInfo: action
+                    })
+                })
+            } else {
+                res.status(404).json({
+                    error: 'Sorry no Action with that ID found or invalid User Data'
+                })
+            }
+        } catch {
+            res.status(500).json({
+                error: 'Server Error'
+            })
         }
     })
 

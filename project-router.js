@@ -14,6 +14,30 @@ router.get('/', (req, res) => {
         })
 })
 
+router.get('/:id', async (req, res) => {
+    const { id } = req.params
+    
+    try {
+        const toGet = await Project.get(id)
+        if(toGet) {
+            Project.get(id)
+                .then(project => {
+                    res.status(200).json({
+                    projectInfo: project
+                })
+            })
+        } else {
+            res.status(404).json({
+                error: 'Sorry no Project with that ID found'
+            })
+        }
+    } catch {
+        res.status(500).json({
+            error: 'Server Error'
+        })
+    }
+})
+
 router.post('/', (req, res) => {
 
     const newProject = req.body
@@ -38,10 +62,55 @@ router.post('/', (req, res) => {
     }
 })
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
     const { id } = req.params
+    
+    try {
+        const toDelete = await Project.get(id)
+        if(toDelete) {
+            Project.remove(id)
+                .then(project => {
+                    res.status(202).json({
+                    success: 'Project was removed',
+                    projectInfo: project
+                })
+            })
+        } else {
+            res.status(404).json({
+                error: 'Sorry no Project with that ID found or invalid User Data'
+            })
+        }
+    } catch {
+        res.status(500).json({
+            error: 'Server Error'
+        })
+    }
 })
 
-
+router.put('/:id', async (req, res) => {
+    const { id } = req.params
+    const newData = req.body
+    
+    try {
+        const toUpdate = await Project.get(id)
+        if(toUpdate && newData.name && newData.description) {
+            Project.update(id, newData)
+                .then(project => {
+                    res.status(200).json({
+                    success: 'Project was updated',
+                    projectInfo: project
+                })
+            })
+        } else {
+            res.status(404).json({
+                error: 'Sorry no Project with that ID found'
+            })
+        }
+    } catch {
+        res.status(500).json({
+            error: 'Server Error'
+        })
+    }
+})
 
 module.exports = router
