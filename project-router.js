@@ -38,6 +38,30 @@ router.get('/:id', async (req, res) => {
     }
 })
 
+router.get('/actions/:id', async (req, res) => {
+    const { id } = req.params
+    
+    try {
+        const toGet = await Project.get(id)
+        if(toGet) {
+            Project.getProjectActions(id)
+                .then(project => {
+                    res.status(200).json({
+                    projectActions: project
+                })
+            })
+        } else {
+            res.status(404).json({
+                error: 'Sorry no Project with that ID found'
+            })
+        }
+    } catch {
+        res.status(500).json({
+            error: 'Server Error'
+        })
+    }
+})
+
 router.post('/', (req, res) => {
 
     const newProject = req.body
